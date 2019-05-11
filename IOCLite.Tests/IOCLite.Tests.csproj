@@ -57,6 +57,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestInterfaces\IName.cs" />
+    <Compile Include="TestClasses\Name.cs" />
     <Compile Include="Tests\IOCLiteContainerTests.cs" />
     <Compile Include="TestInterfaces\IPerson.cs" />
     <Compile Include="TestClasses\Person.cs" />

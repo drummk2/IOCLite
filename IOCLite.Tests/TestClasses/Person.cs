@@ -5,9 +5,8 @@
     /// </summary>
     internal class Person : IPerson
     {
-        /// <summary>
-        /// The person's full name.
-        /// </summary>
-        public string Name { get; set; }
+        public IName Name { get; set; }
+
+        public Person(IName name) => Name = name;
     }
 }
