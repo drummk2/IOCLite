@@ -45,6 +45,7 @@
     <Compile Include="Classes\IOCLiteContractImplementation.cs" />
     <Compile Include="Classes\IOCLiteException.cs" />
     <Compile Include="Enums\IOCLiteLifeSpan.cs" />
+    <Compile Include="Interfaces\IIOCLiteModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

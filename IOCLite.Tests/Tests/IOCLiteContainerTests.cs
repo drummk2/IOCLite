@@ -8,6 +8,19 @@ namespace IOCLite.Tests
     public class IOCLiteContainerTests
     {
         /// <summary>
+        /// The user should be able to install an IOCLiteModule containing multiple registrations.
+        /// Those registrations should then be registered in bulk in the intended container.
+        /// </summary>
+        [Fact]
+        public void Install_ValidModuleProvided_RegistersModuleCorrectly()
+        {
+            IOCLiteContainer container = new IOCLiteContainer();
+            container.Install(new TestModule());
+            IPerson p = container.Resolve<IPerson>();
+            Assert.True(Equals(typeof(Person), p.GetType()));
+        }
+
+        /// <summary>
         /// The IOCLiteContainer should throw an IOCLiteException when it tries to resolve a 
         /// type that has not been registered. In this case the Resolve(Type type) function is called.
         /// </summary>

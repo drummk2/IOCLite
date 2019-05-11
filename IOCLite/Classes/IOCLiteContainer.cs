@@ -32,6 +32,12 @@ namespace IOCLite
         }
 
         /// <summary>
+        /// Installs a new IOCLiteModule on the container in question and subsequently registers and 
+        /// pre-existing registrations in the module.
+        /// </summary>
+        public void Install(IIOCLiteModule module) => module.RegisterComponents(this);
+
+        /// <summary>
         /// Adds a new registration to the container with both a contract type and implementation type.
         /// Also ensures that the implementation type implements the contract type. The transient lifespan is defaultly set.
         /// </summary>
@@ -55,6 +61,12 @@ namespace IOCLite
                        ImplementationType = typeof(TImplementation),
                        LifeSpan = lifeSpan
                    });
+
+        /// <summary>
+        /// Register multiple components in the container at once.
+        /// </summary>
+        /// <param name="registrations">The set of registrations to be made.</param>
+        public void RegisterAll(Action[] registrations) => registrations.ToList().ForEach(action => action());
 
         /// <summary>
         /// Resolve an object when provided with a generic type parameter rather than a type object.
