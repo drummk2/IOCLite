@@ -91,7 +91,7 @@ namespace IOCLite
                 lifeSpan = _objectRegistrations[contractType].LifeSpan;
             }
             else
-                throw new IOCLiteException($"Unable to resolve implementation for contract of type {contractType.ToString()}");
+                throw new IOCLiteException($"Unable to resolve implementation for contract of type {contractType}");
 
             ConstructorInfo objectConstructor = implementationType
                 .GetConstructors()

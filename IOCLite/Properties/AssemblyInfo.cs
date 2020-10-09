@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("IOCLite")]
-[assembly: AssemblyDescription("A simple lightweight library to be used when implementing DI in an application.")]
+[assembly: AssemblyDescription("A simple lightweight library to be used when implementing dependency injection in an application.")]
 [assembly: AssemblyProduct("IOCLite")]
 [assembly: AssemblyCopyright("Copyright ©  2019")]
 [assembly: ComVisible(false)]
