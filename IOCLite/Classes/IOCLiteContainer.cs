@@ -95,13 +95,11 @@ namespace IOCLite
         /// </summary>
         public void RegisterControllers()
         {
-            IEnumerable<Type> implementingTypes = AppDomain.CurrentDomain.GetAssemblies()
+            AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(t => t.GetTypes())
-                .Where(c => typeof(Controller).IsAssignableFrom(c)
-                         || typeof(ApiController).IsAssignableFrom(c));
-
-            implementingTypes.ToList()
-                             .ForEach(controllerType => Register(controllerType, controllerType, IOCLiteLifeSpan.SINGLETON));
+                .Where(c => typeof(Controller).IsAssignableFrom(c) || typeof(ApiController).IsAssignableFrom(c));
+                .ToList()
+                .ForEach(controllerType => Register(controllerType, controllerType, IOCLiteLifeSpan.SINGLETON));
         }
 
         /// <summary>
