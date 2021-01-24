@@ -1,4 +1,4 @@
-﻿namespace IOCLite
+﻿namespace IOCLite.Interfaces
 {
     /// <summary>
     /// To be implemented by any module classes that are to be installed on an IOCLiteContainer.

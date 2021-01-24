@@ -1,7 +1,12 @@
-﻿using System;
+﻿using IOCLite.Enums;
+using IOCLite.Exceptions;
+using IOCLite.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Web.Http;
+using System.Web.Mvc;
 
 namespace IOCLite
 {
@@ -43,22 +48,39 @@ namespace IOCLite
         /// </summary>
         /// <typeparam name="TContract">The type of the contract</typeparam>
         /// <typeparam name="TImplementation">The type of the contract implementation.</typeparam>
-        public void Register<TContract, TImplementation>() where TImplementation : TContract 
-            => Register<TContract, TImplementation>(IOCLiteLifeSpan.TRANSIENT);
+        public void Register<TContract, TImplementation>() where TImplementation : TContract
+            => Register(typeof(TContract), typeof(TImplementation), IOCLiteLifeSpan.TRANSIENT);
 
         /// <summary>
         /// Adds a new registration to the container with both a contract type and implementation type.
         /// Also ensures that the implementation type implements the contract type. And a life span is specified.
         /// </summary>
-        /// <typeparam name="TContract">The type of the contract</typeparam>
+        /// <typeparam name="TContract">The type of the contract.</typeparam>
         /// <typeparam name="TImplementation">The type of the contract implementation.</typeparam>
         /// <param name="lifeSpan">The specified life span for the TImplementation type.</param>
         public void Register<TContract, TImplementation>(IOCLiteLifeSpan lifeSpan) where TImplementation : TContract
+            => Register(typeof(TContract), typeof(TImplementation), lifeSpan);
+
+        /// <summary>
+        /// Adds a new registration to the container with both a contract type and implementation type.
+        /// </summary>
+        /// <param name="contract">The type of the contract.</param>
+        /// <param name="implementation">The type of the implementation.</param>
+        public void Register(Type contract, Type implementation)
+            => Register(contract, implementation, IOCLiteLifeSpan.TRANSIENT);
+
+        /// <summary>
+        /// Adds a new registration to the container with both a contract type and implementation type.
+        /// </summary>
+        /// <param name="contract">The type of the contract.</param>
+        /// <param name="implementation">The type of the implementation.</param>
+        /// <param name="lifeSpan">The specified life span for the TImplementation type.</param>
+        public void Register(Type contract, Type implementation, IOCLiteLifeSpan lifeSpan)
             => _objectRegistrations.Add(
-                   typeof(TContract),
+                   contract,
                    new IOCLiteContractImplementation
                    {
-                       ImplementationType = typeof(TImplementation),
+                       ImplementationType = implementation,
                        LifeSpan = lifeSpan
                    });
 
@@ -67,6 +89,20 @@ namespace IOCLite
         /// </summary>
         /// <param name="registrations">The set of registrations to be made.</param>
         public void RegisterAll(Action[] registrations) => registrations.ToList().ForEach(action => action());
+
+        /// <summary>
+        /// Register all classes that implement APIController or Controller.
+        /// </summary>
+        public void RegisterControllers()
+        {
+            IEnumerable<Type> implementingTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(t => t.GetTypes())
+                .Where(c => typeof(Controller).IsAssignableFrom(c)
+                         || typeof(ApiController).IsAssignableFrom(c));
+
+            implementingTypes.ToList()
+                             .ForEach(controllerType => Register(controllerType, controllerType, IOCLiteLifeSpan.SINGLETON));
+        }
 
         /// <summary>
         /// Resolve an object when provided with a generic type parameter rather than a type object.
@@ -82,8 +118,8 @@ namespace IOCLite
         /// <returns>An object implementing the specified contract.</returns>
         public object Resolve(Type contractType)
         {
-            Type implementationType = default;
-            IOCLiteLifeSpan lifeSpan = default;
+            Type implementationType;
+            IOCLiteLifeSpan lifeSpan;
 
             if (_objectRegistrations.ContainsKey(contractType))
             {
@@ -93,6 +129,28 @@ namespace IOCLite
             else
                 throw new IOCLiteException($"Unable to resolve implementation for contract of type {contractType}");
 
+            if (lifeSpan.Equals(IOCLiteLifeSpan.SINGLETON))
+            {
+                if (_singletonInstances.ContainsKey(contractType))
+                    return _singletonInstances[contractType];
+                else
+                {
+                    object instance = CreateInstance(implementationType);
+                    _singletonInstances.Add(contractType, instance);
+                    return instance;
+                }
+            }
+
+            return CreateInstance(implementationType);
+        }
+
+        /// <summary>
+        /// Create an instance of the specified <see cref="Type"/>.
+        /// </summary>
+        /// <param name="implementationType">The type of object being created/</param>
+        /// <returns>An instance of the specified type.</returns>
+        private object CreateInstance(Type implementationType)
+        {
             ConstructorInfo objectConstructor = implementationType
                 .GetConstructors()
                 .OrderByDescending(c => c.GetParameters().Length)
@@ -103,17 +161,7 @@ namespace IOCLite
                 .Select(p => Resolve(p.ParameterType))
                 .ToArray();
 
-            object instance = Activator.CreateInstance(implementationType, constructorArguments);
-
-            if (lifeSpan.Equals(IOCLiteLifeSpan.SINGLETON))
-            {
-                if (_singletonInstances.ContainsKey(contractType))
-                    return _singletonInstances[contractType];
-                else
-                    _singletonInstances.Add(contractType, instance);
-            }
-
-            return instance;
+            return Activator.CreateInstance(implementationType, constructorArguments);
         }
     }
 }

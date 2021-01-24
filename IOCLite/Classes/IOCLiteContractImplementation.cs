@@ -1,9 +1,10 @@
-﻿using System;
+﻿using IOCLite.Enums;
+using System;
 
 namespace IOCLite
 {
     /// <summary>
-    /// Represents an implementation of a registered service (interface) in the IOCLiteContainer.
+    /// Represents an implementation of a registered service in the IOCLiteContainer.
     /// </summary>
     public class IOCLiteContractImplementation
     {

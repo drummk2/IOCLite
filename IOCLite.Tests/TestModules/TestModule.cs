@@ -1,6 +1,10 @@
-﻿using System;
+﻿using IOCLite.Enums;
+using IOCLite.Interfaces;
+using IOCLite.Tests.TestClasses;
+using IOCLite.Tests.TestInterfaces;
+using System;
 
-namespace IOCLite.Tests
+namespace IOCLite.Tests.TestModules
 {
     /// <summary>
     /// Test module to be installed into a test container during unit testing.

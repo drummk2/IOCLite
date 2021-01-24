@@ -1,4 +1,6 @@
-﻿namespace IOCLite.Tests
+﻿using IOCLite.Tests.TestInterfaces;
+
+namespace IOCLite.Tests.TestClasses
 {
     /// <summary>
     /// Test class representing a person. Implements the IPerson interface for DI purposes.

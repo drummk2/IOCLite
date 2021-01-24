@@ -1,4 +1,9 @@
-﻿using Xunit;
+﻿using IOCLite.Enums;
+using IOCLite.Exceptions;
+using IOCLite.Tests.TestClasses;
+using IOCLite.Tests.TestInterfaces;
+using IOCLite.Tests.TestModules;
+using Xunit;
 
 namespace IOCLite.Tests
 {
@@ -18,6 +23,32 @@ namespace IOCLite.Tests
             container.Install(new TestModule());
             IPerson p = container.Resolve<IPerson>();
             Assert.True(Equals(typeof(Person), p.GetType()));
+        }
+
+        /// <summary>
+        /// When a class implementing the <see cref="ApiController"/> base class is present in the assembly,
+        /// this function should register an instance of the class in question in the container.
+        /// </summary>
+        [Fact]
+        public void RegisterControllers_SuccessfullyRegistersApiControllerImplementation_InstanceReturned()
+        {
+            IOCLiteContainer container = new IOCLiteContainer();
+            container.RegisterControllers();
+            PersonApiController apiController = container.Resolve<PersonApiController>();
+            Assert.Equal(typeof(PersonApiController), apiController.GetType());
+        }
+
+        /// <summary>
+        /// When a class implementing the <see cref="Controller"/> base class is present in the assembly,
+        /// this function should register an instance of the class in question in the container.
+        /// </summary>
+        [Fact]
+        public void RegisterControllers_SuccessfullyRegistersControllerImplementation_InstanceReturned()
+        {
+            IOCLiteContainer container = new IOCLiteContainer();
+            container.RegisterControllers();
+            PersonController controller = container.Resolve<PersonController>();
+            Assert.Equal(typeof(PersonController), controller.GetType());
         }
 
         /// <summary>
@@ -47,7 +78,7 @@ namespace IOCLite.Tests
             container.Register<IPerson, Person>();
             container.Register<IName, Name>();
             IPerson p = container.Resolve<IPerson>();
-            Assert.True(Equals(typeof(Person), p.GetType()));
+            Assert.Equal(typeof(Person), p.GetType());
         }
 
         /// <summary>
@@ -62,7 +93,7 @@ namespace IOCLite.Tests
             container.Register<IName, Name>();
             IPerson firstInstance = container.Resolve<IPerson>();
             IPerson secondInstance = container.Resolve<IPerson>();
-            Assert.True(Equals(firstInstance, secondInstance));
+            Assert.Equal(firstInstance, secondInstance);
         }
 
         /// <summary>
@@ -93,7 +124,7 @@ namespace IOCLite.Tests
             container.Register<IName, Name>(IOCLiteLifeSpan.SINGLETON);
             IPerson firstInstance = container.Resolve<IPerson>();
             IPerson secondInstance = container.Resolve<IPerson>();
-            Assert.True(Equals(firstInstance.Name, secondInstance.Name));
+            Assert.Equal(firstInstance.Name, secondInstance.Name);
         }
     }
 }

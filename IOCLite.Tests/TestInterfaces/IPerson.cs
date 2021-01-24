@@ -1,4 +1,4 @@
-﻿namespace IOCLite.Tests
+﻿namespace IOCLite.Tests.TestInterfaces
 {
     /// <summary>
     /// An interface to be implemented by the Person class for DI purposes.

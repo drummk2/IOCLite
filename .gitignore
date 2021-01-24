@@ -5,3 +5,5 @@ IOCLite/.vs/IOCLite/v16/.suo
 *.lock
 *.ide
 *.ide
+*.testlog
+*.manifest

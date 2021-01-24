@@ -1,4 +1,4 @@
-﻿namespace IOCLite
+﻿namespace IOCLite.Enums
 {
     /// <summary>
     /// Represents an implementation's lifespan.
