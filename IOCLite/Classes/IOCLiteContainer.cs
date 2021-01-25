@@ -20,12 +20,12 @@ namespace IOCLite
         /// Handles any object registrations made in the IOCLiteContainer.
         /// Maps interface types to concrete class types.
         /// </summary>
-        private Dictionary<Type, IOCLiteContractImplementation> _objectRegistrations;
+        private readonly Dictionary<Type, IOCLiteContractImplementation> _objectRegistrations;
 
         /// <summary>
         /// Stores any initialised singleton objects.
         /// </summary>
-        private Dictionary<Type, object> _singletonInstances;
+        private readonly Dictionary<Type, object> _singletonInstances;
 
         /// <summary>
         /// Initialise the dictionaries needed for container registrations and initialised singletons.
@@ -67,7 +67,12 @@ namespace IOCLite
         /// <param name="contract">The type of the contract.</param>
         /// <param name="implementation">The type of the implementation.</param>
         public void Register(Type contract, Type implementation)
-            => Register(contract, implementation, IOCLiteLifeSpan.TRANSIENT);
+        {
+            if (contract.IsAssignableFrom(implementation))
+                Register(contract, implementation, IOCLiteLifeSpan.TRANSIENT);
+            else
+                throw new IOCLiteException($"The type {implementation.FullName} is not assignable to {contract.FullName}.");
+        }
 
         /// <summary>
         /// Adds a new registration to the container with both a contract type and implementation type.
@@ -76,13 +81,20 @@ namespace IOCLite
         /// <param name="implementation">The type of the implementation.</param>
         /// <param name="lifeSpan">The specified life span for the TImplementation type.</param>
         public void Register(Type contract, Type implementation, IOCLiteLifeSpan lifeSpan)
-            => _objectRegistrations.Add(
-                   contract,
-                   new IOCLiteContractImplementation
-                   {
-                       ImplementationType = implementation,
-                       LifeSpan = lifeSpan
-                   });
+        {
+            if (contract.IsAssignableFrom(implementation))
+            {
+                _objectRegistrations.Add(
+                       contract,
+                       new IOCLiteContractImplementation
+                       {
+                           ImplementationType = implementation,
+                           LifeSpan = lifeSpan
+                       });
+            }
+            else
+                throw new IOCLiteException($"The type {implementation.FullName} is not assignable to {contract.FullName}.");
+        }
 
         /// <summary>
         /// Register multiple components in the container at once.
@@ -97,7 +109,7 @@ namespace IOCLite
         {
             AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(t => t.GetTypes())
-                .Where(c => typeof(Controller).IsAssignableFrom(c) || typeof(ApiController).IsAssignableFrom(c));
+                .Where(c => typeof(Controller).IsAssignableFrom(c) || typeof(ApiController).IsAssignableFrom(c))
                 .ToList()
                 .ForEach(controllerType => Register(controllerType, controllerType, IOCLiteLifeSpan.SINGLETON));
         }
