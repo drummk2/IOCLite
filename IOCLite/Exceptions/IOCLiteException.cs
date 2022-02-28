@@ -9,7 +9,7 @@ namespace IOCLite.Exceptions
     public class IOCLiteException : Exception
     {
         /// <summary>
-        /// Throws a IOCLiteException with the specified message.
+        /// Throws an IOCLiteException with the specified message.
         /// </summary>
         /// <param name="message">An appropriate error message.</param>
         public IOCLiteException(string message) : base(message) { }
