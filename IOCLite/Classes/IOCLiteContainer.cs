@@ -17,6 +17,11 @@ namespace IOCLite
     public class IOCLiteContainer
     {
         /// <summary>
+        /// A lock object to be used for thread-safe operations.
+        /// </summary>
+        private readonly object _lockObject;
+
+        /// <summary>
         /// Handles any object registrations made in the IOCLiteContainer.
         /// Maps interface types to concrete class types.
         /// </summary>
@@ -32,6 +37,7 @@ namespace IOCLite
         /// </summary>
         public IOCLiteContainer()
         {
+            _lockObject = new object();
             _objectRegistrations = new Dictionary<Type, IOCLiteContractImplementation>();
             _singletonInstances = new Dictionary<Type, object>();
         }
@@ -141,13 +147,16 @@ namespace IOCLite
 
             if (lifeSpan.Equals(IOCLiteLifeSpan.SINGLETON))
             {
-                if (_singletonInstances.ContainsKey(contractType))
-                    return _singletonInstances[contractType];
-                else
+                lock (_lockObject)
                 {
-                    object instance = CreateInstance(implementationType);
-                    _singletonInstances.Add(contractType, instance);
-                    return instance;
+                    if (_singletonInstances.ContainsKey(contractType))
+                        return _singletonInstances[contractType];
+                    else
+                    {
+                        object instance = CreateInstance(implementationType);
+                        _singletonInstances.Add(contractType, instance);
+                        return instance;
+                    }
                 }
             }
 

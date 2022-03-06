@@ -66,36 +66,7 @@ namespace IOCLite.Tests
         [Fact]
         public void ResolveGenericArgument_NoRegistrationExists_ThrowsIOCLiteException()
             => Assert.Throws<IOCLiteException>(() => new IOCLiteContainer().Resolve<IOCLiteException>());
-
-        /// <summary>
-        /// When a valid container registration exists, the container should return an instance 
-        /// of it's implementation type when asked to resolve that contract type.
-        /// </summary>
-        [Fact]
-        public void Resolve_RegistrationExists_InstanceReturned()
-        {
-            IOCLiteContainer container = new IOCLiteContainer();
-            container.Register<IPerson, Person>();
-            container.Register<IName, Name>();
-            IPerson p = container.Resolve<IPerson>();
-            Assert.Equal(typeof(Person), p.GetType());
-        }
-
-        /// <summary>
-        /// When a valid container singleton registration exists, the container should return a singleton 
-        /// instance of it's implementation type when asked to resolve that contract type.
-        /// </summary>
-        [Fact]
-        public void Resolve_SingletonRegistrationExists_SingletonInstanceReturned()
-        {
-            IOCLiteContainer container = new IOCLiteContainer();
-            container.Register<IPerson, Person>(IOCLiteLifeSpan.SINGLETON);
-            container.Register<IName, Name>();
-            IPerson firstInstance = container.Resolve<IPerson>();
-            IPerson secondInstance = container.Resolve<IPerson>();
-            Assert.Equal(firstInstance, secondInstance);
-        }
-
+        
         /// <summary>
         /// When a valid container registration exists. And the constructor of that registration's implementation 
         /// also contains a separate container registration, verify that an implementation of a contract is resolved 
@@ -125,6 +96,35 @@ namespace IOCLite.Tests
             IPerson firstInstance = container.Resolve<IPerson>();
             IPerson secondInstance = container.Resolve<IPerson>();
             Assert.Equal(firstInstance.Name, secondInstance.Name);
+        }
+
+        /// <summary>
+        /// When a valid container registration exists, the container should return an instance 
+        /// of it's implementation type when asked to resolve that contract type.
+        /// </summary>
+        [Fact]
+        public void Resolve_RegistrationExists_InstanceReturned()
+        {
+            IOCLiteContainer container = new IOCLiteContainer();
+            container.Register<IPerson, Person>();
+            container.Register<IName, Name>();
+            IPerson p = container.Resolve<IPerson>();
+            Assert.Equal(typeof(Person), p.GetType());
+        }
+
+        /// <summary>
+        /// When a valid container singleton registration exists, the container should return a singleton 
+        /// instance of it's implementation type when asked to resolve that contract type.
+        /// </summary>
+        [Fact]
+        public void Resolve_SingletonRegistrationExists_SingletonInstanceReturned()
+        {
+            IOCLiteContainer container = new IOCLiteContainer();
+            container.Register<IPerson, Person>(IOCLiteLifeSpan.SINGLETON);
+            container.Register<IName, Name>();
+            IPerson firstInstance = container.Resolve<IPerson>();
+            IPerson secondInstance = container.Resolve<IPerson>();
+            Assert.Equal(firstInstance, secondInstance);
         }
     }
 }
